@@ -43,7 +43,11 @@ class SingleInstancexx {
         onRecvSecondWindowMsg,
       );
     } else if (Platform.isMacOS || Platform.isLinux) {
-      return await _UnixHandle.handle(arguments, onRecvSecondWindowMsg);
+      return await _UnixHandle.handle(
+        arguments,
+        pipeName,
+        onRecvSecondWindowMsg,
+      );
     }
     return false;
   }
