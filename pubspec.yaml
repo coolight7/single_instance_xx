@@ -26,4 +26,4 @@ flutter:
   plugin:
     platforms:
       windows:
-        pluginClass: SingleInstancexxPlugin
+        pluginClass: SingleInstanceXxPlugin
