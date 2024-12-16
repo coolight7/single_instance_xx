@@ -153,7 +153,7 @@ bool SingleInstancexxPlugin::isSingleInstance(std::wstring name) {
 
 }  // namespace
 
-void SingleInstancexxPluginRegisterWithRegistrar(
+void SingleInstanceXxPluginRegisterWithRegistrar(
     FlutterDesktopPluginRegistrarRef registrar) {
   SingleInstancexxPlugin::RegisterWithRegistrar(
       flutter::PluginRegistrarManager::GetInstance()

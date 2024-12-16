@@ -11,9 +11,9 @@
 
 #if defined(__cplusplus)
 extern "C" {
-#endif
+#endifX
 
-FLUTTER_PLUGIN_EXPORT void SingleInstancexxPluginRegisterWithRegistrar(
+FLUTTER_PLUGIN_EXPORT void SingleInstanceXxPluginRegisterWithRegistrar(
     FlutterDesktopPluginRegistrarRef registrar);
 
 #if defined(__cplusplus)
