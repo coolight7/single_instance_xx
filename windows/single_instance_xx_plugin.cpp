@@ -1,4 +1,4 @@
-#include "include/windows_single_instance/windows_single_instance_plugin.h"
+#include "include/single_instance_xx/single_instance_xx_plugin.h"
 
 // This must be included before many other Windows headers.
 #include <windows.h>
@@ -37,13 +37,13 @@ std::wstring Utf16FromUtf8(const std::string& utf8_string) {
   return utf16_string;
 }
 
-class WindowsSingleInstancePlugin : public flutter::Plugin {
+class SingleInstancexxPlugin : public flutter::Plugin {
  public:
   static void RegisterWithRegistrar(flutter::PluginRegistrarWindows *registrar);
 
-  WindowsSingleInstancePlugin(flutter::PluginRegistrarWindows *registrar);
+  SingleInstancexxPlugin(flutter::PluginRegistrarWindows *registrar);
 
-  virtual ~WindowsSingleInstancePlugin();
+  virtual ~SingleInstancexxPlugin();
 
  private:
   // Called when a method is called on this plugin's channel from Dart.
@@ -59,14 +59,14 @@ class WindowsSingleInstancePlugin : public flutter::Plugin {
 };
 
 // static
-void WindowsSingleInstancePlugin::RegisterWithRegistrar(
+void SingleInstancexxPlugin::RegisterWithRegistrar(
     flutter::PluginRegistrarWindows *registrar) {
   auto channel =
       std::make_unique<flutter::MethodChannel<flutter::EncodableValue>>(
-          registrar->messenger(), "windows_single_instance",
+          registrar->messenger(), "single_instance_xx",
           &flutter::StandardMethodCodec::GetInstance());
 
-  auto plugin = std::make_unique<WindowsSingleInstancePlugin>(registrar);
+  auto plugin = std::make_unique<SingleInstancexxPlugin>(registrar);
 
   channel->SetMethodCallHandler(
       [plugin_pointer = plugin.get()](const auto &call, auto result) {
@@ -76,16 +76,16 @@ void WindowsSingleInstancePlugin::RegisterWithRegistrar(
   registrar->AddPlugin(std::move(plugin));
 }
 
-WindowsSingleInstancePlugin::WindowsSingleInstancePlugin(flutter::PluginRegistrarWindows *registrar) 
+SingleInstancexxPlugin::SingleInstancexxPlugin(flutter::PluginRegistrarWindows *registrar) 
   : registrar_(registrar) {}
 
-WindowsSingleInstancePlugin::~WindowsSingleInstancePlugin() {
+SingleInstancexxPlugin::~SingleInstancexxPlugin() {
   if (mutex != NULL) {
       ::ReleaseMutex(mutex);
   }
 }
 
-void WindowsSingleInstancePlugin::HandleMethodCall(
+void SingleInstancexxPlugin::HandleMethodCall(
     const flutter::MethodCall<flutter::EncodableValue> &method_call,
     std::unique_ptr<flutter::MethodResult<flutter::EncodableValue>> result) {
   if (method_call.method_name().compare("isSingleInstance") == 0) {
@@ -135,7 +135,7 @@ void WindowsSingleInstancePlugin::HandleMethodCall(
   result->NotImplemented();
 }
 
-bool WindowsSingleInstancePlugin::isSingleInstance(std::wstring name) {
+bool SingleInstancexxPlugin::isSingleInstance(std::wstring name) {
   // Only call once
   if (mutex != NULL) {
     return true;
@@ -155,7 +155,7 @@ bool WindowsSingleInstancePlugin::isSingleInstance(std::wstring name) {
 
 void WindowsSingleInstancePluginRegisterWithRegistrar(
     FlutterDesktopPluginRegistrarRef registrar) {
-  WindowsSingleInstancePlugin::RegisterWithRegistrar(
+  SingleInstancexxPlugin::RegisterWithRegistrar(
       flutter::PluginRegistrarManager::GetInstance()
           ->GetRegistrar<flutter::PluginRegistrarWindows>(registrar));
 }
