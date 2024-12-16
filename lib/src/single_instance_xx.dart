@@ -31,8 +31,8 @@ class SingleInstancexx {
   /// `onSecondWindow`: Callback function that is called when a second window is attempted to be opened.
   static Future<bool> signSingleInstance(
     List<String> arguments,
-    String pipeName, {
-    Function(List<String>)? onRecvSecondWindowMsg,
+    String pipeName,
+    Function(List<String>) onRecvSecondWindowMsg, {
     bool kDebugMode = false,
   }) async {
     _kDebugMode = kDebugMode;
@@ -40,14 +40,10 @@ class SingleInstancexx {
       return _WindowsHandle.handle(
         arguments,
         pipeName,
-        onRecvSecondWindowMsg: onRecvSecondWindowMsg,
+        onRecvSecondWindowMsg,
       );
     } else if (Platform.isMacOS || Platform.isLinux) {
-      return await _UnixHandle.handle(arguments, (args) {
-        if (onRecvSecondWindowMsg != null) {
-          onRecvSecondWindowMsg(args);
-        }
-      });
+      return await _UnixHandle.handle(arguments, onRecvSecondWindowMsg);
     }
     return false;
   }
@@ -161,9 +157,9 @@ class _WindowsHandle {
 
   static Future<bool> handle(
     List<String> arguments,
-    String pipeName, {
-    Function(List<String>)? onRecvSecondWindowMsg,
-  }) async {
+    String pipeName,
+    Function(List<String>) onRecvSecondWindowMsg,
+  ) async {
     final fullPipeName = "\\\\.\\pipe\\$pipeName";
     final bool isSingleInstance = await _channel
         .invokeMethod('isSingleInstance', <String, Object>{"pipe": pipeName});
@@ -171,11 +167,6 @@ class _WindowsHandle {
       // 已经存在窗口，当前非第一个
       _writePipeData(fullPipeName, arguments);
       return false;
-    }
-
-    // No callback so don't bother starting pipe
-    if (onRecvSecondWindowMsg == null) {
-      return true;
     }
 
     final reader = ReceivePort()
@@ -193,11 +184,15 @@ class _WindowsHandle {
 class _UnixHandle {
   static Future<bool> handle(
     List<String> arguments,
+    String pipeName,
     void Function(List<String> args) onRecvSecondWindowMsg,
   ) async {
-    // TODO make a named arg
+    if (pipeName.length >= 10) {
+      debugPrint(
+          "[SingleInstancexx] pipeName don't be longer than 10 characters");
+    }
     // Kept short because of mac os x sandboxing makes the name too long for unix sockets.
-    var socketFilename = 'socket';
+    var socketFilename = 'single_$pipeName';
     // TODO make configurable so it can be per X, per User, or for the whole machine based on optional named args
     var configPath = await _applicationConfigDirectory();
     await Directory(configPath).create(recursive: true);
