@@ -62,10 +62,10 @@ class _WindowsHandle {
     try {
       return CreateFile(
         cPipe,
-        GENERIC_ACCESS_RIGHTS.GENERIC_WRITE,
+        GENERIC_WRITE,
         0,
         nullptr,
-        FILE_CREATION_DISPOSITION.OPEN_EXISTING,
+        OPEN_EXISTING,
         0,
         0,
       );
@@ -79,12 +79,10 @@ class _WindowsHandle {
     try {
       return CreateNamedPipe(
         cPipe,
-        FILE_FLAGS_AND_ATTRIBUTES.PIPE_ACCESS_INBOUND |
-            FILE_FLAGS_AND_ATTRIBUTES.FILE_FLAG_FIRST_PIPE_INSTANCE |
-            FILE_FLAGS_AND_ATTRIBUTES.FILE_FLAG_OVERLAPPED,
-        NAMED_PIPE_MODE.PIPE_TYPE_MESSAGE |
-            NAMED_PIPE_MODE.PIPE_READMODE_MESSAGE |
-            NAMED_PIPE_MODE.PIPE_WAIT,
+        PIPE_ACCESS_INBOUND |
+            FILE_FLAG_FIRST_PIPE_INSTANCE |
+            FILE_FLAG_OVERLAPPED,
+        PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
         PIPE_UNLIMITED_INSTANCES,
         4096,
         4096,
@@ -106,7 +104,7 @@ class _WindowsHandle {
           if (err == _kErrorPipeConnected) {
             sleep(const Duration(milliseconds: 200));
             continue;
-          } else if (err == WIN32_ERROR.ERROR_INVALID_HANDLE) {
+          } else if (err == ERROR_INVALID_HANDLE) {
             return;
           }
           break;
