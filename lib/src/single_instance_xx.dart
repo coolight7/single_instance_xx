@@ -57,28 +57,28 @@ class _WindowsHandle {
   static const MethodChannel _channel = MethodChannel('single_instance_xx');
   static const _kErrorPipeConnected = 0x80070217;
 
-  static int _openPipe(String filename) {
+  static HANDLE _openPipe(String filename) {
     final cPipe = filename.toNativeUtf16();
     try {
       return CreateFile(
-        cPipe,
+        PCWSTR(cPipe),
         GENERIC_WRITE,
-        0,
+        FILE_SHARE_NONE,
         nullptr,
         OPEN_EXISTING,
-        0,
-        0,
-      );
+        SECURITY_ANONYMOUS,
+        null,
+      ).value;
     } finally {
       free(cPipe);
     }
   }
 
-  static int _createPipe(String filename) {
+  static HANDLE _createPipe(String filename) {
     final cPipe = filename.toNativeUtf16();
     try {
       return CreateNamedPipe(
-        cPipe,
+        PCWSTR(cPipe),
         PIPE_ACCESS_INBOUND |
             FILE_FLAG_FIRST_PIPE_INSTANCE |
             FILE_FLAG_OVERLAPPED,
@@ -94,7 +94,7 @@ class _WindowsHandle {
     }
   }
 
-  static void _readPipe(SendPort writer, int pipeHandle) {
+  static void _readPipe(SendPort writer, HANDLE pipeHandle) {
     final overlap = calloc<OVERLAPPED>();
     try {
       while (true) {
@@ -114,7 +114,8 @@ class _WindowsHandle {
         var data = calloc<Uint8>(dataSize);
         final numRead = calloc<Uint32>();
         try {
-          while (GetOverlappedResult(pipeHandle, overlap, numRead, 0) == 0) {
+          while (false ==
+              GetOverlappedResult(pipeHandle, overlap, numRead, false).value) {
             sleep(const Duration(milliseconds: 200));
           }
 
